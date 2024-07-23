@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommunicationApiService } from 'src/app/services/communication-api.service';
+import { EmpleadosService } from 'src/app/services/comunicationAPI/seguridad/empleados.service';
+import { AreasService } from 'src/app/services/comunicationAPI/seguridad/areas.service';
+import { DepartamentosService } from 'src/app/services/comunicationAPI/seguridad/departamentos.service';
 import { Observable, map } from 'rxjs';
 
 
@@ -44,24 +46,34 @@ export class EmpleadosComponent implements OnInit {
   dptoList$!: Observable<any[]>;
 
 
-  constructor(private service: CommunicationApiService) { }
+  constructor(
+    private empService: EmpleadosService,
+    private areaService: AreasService,
+    private deptoService: DepartamentosService) { }
+
+    
+  tabla: string = '';
+  
 
   ngOnInit() {
-    //carga los datos de la tabla empleados en un observable
-    this.empleadoList$ = this.service.getEmpleadosList();
-
-    //pasa los datos del observable de empleados a una lista
-    this.empleadoList$.subscribe((data) => {
-      this.empleados = data;
-    });
-
-    //carga los datos de la tabla area en un observable
-    this.areaList$ = this.service.getAreaList();
-
-    //carga el contenido de la tabla de departamentos en un observable ordenandolos en orden alfabético
-    this.dptoList$ = this.service.getDepartamentos().pipe(
-      map(departamentos => departamentos.sort((a, b) => a.depDescp.localeCompare(b.depDescp)))
-    );
+    setTimeout(() => {
+      
+      //carga los datos de la tabla empleados en un observable
+      this.empleadoList$ = this.empService.getEmpleadosList();
+  
+      //pasa los datos del observable de empleados a una lista
+      this.empleadoList$.subscribe((data) => {
+        this.empleados = data;
+      });
+  
+      //carga los datos de la tabla area en un observable
+      this.areaList$ = this.areaService.getAreaList();
+  
+      //carga el contenido de la tabla de departamentos en un observable ordenandolos en orden alfabético
+      this.dptoList$ = this.deptoService.getDepartamentos().pipe(
+        map(departamentos => departamentos.sort((a, b) => a.depDescp.localeCompare(b.depDescp)))
+      );
+    }, 100);
 
     /*recorre la lista de empleados y guarda el ultimo id de nomina que sea menor a 10000 luego de un tiempo 
     para asegurarse que los datos ya esten cargados en la lista*/
@@ -73,11 +85,25 @@ export class EmpleadosComponent implements OnInit {
           this.lastIdnomina = empleado.empleadoIdNomina;
         }
       }
-    }, 100);
+    }, 200);
   }
 
+  updateEmpleadosFrom230() {
+    this.empService.updateEmpleados(this.tabla).subscribe(
+      response => {
+        // Manejar la respuesta de la API aquí si es necesario
+        console.log('Empleados actualizados exitosamente:', response);
+      },
+      error => {
+        // Manejar cualquier error que ocurra durante la llamada a la API aquí
+        console.error('Error:', error);
+      }
+    );
+  }
+  
   //busca en la lista empleados segun el termino de busqueda proporcionado por la variable terminoBusqueda
   search() {
+    this.currentPage = 1;
     const term = this.terminoBusqueda.trim().toLowerCase();
 
     if (term === '') {
@@ -106,7 +132,16 @@ export class EmpleadosComponent implements OnInit {
 
   //incrementa el valor d la variable que controla la pagina actual que se muestra
   nextPage(): void {
-    this.currentPage++;
+    //console.log("nextPage",this.currentPage);
+    if (this.empleados.length <= 10) {
+      //console.log("nextPage",this.currentPage);
+      this.currentPage = 1;
+    } else if (this.currentPage >= this.empleados.length / 10) {
+      this.currentPage = this.currentPage;
+    } else {
+      this.currentPage++
+    }
+
   }
 
   //decrementa el valor de la variable que controla la pagina actual que se muestra
@@ -132,11 +167,11 @@ export class EmpleadosComponent implements OnInit {
     if (this.checkSexo === 'M') {
       this.showOther = false;
       this.empSexo = this.checkSexo;
-      console.log(this.empSexo);
+      //console.log(this.empSexo);
     } else if (this.checkSexo === 'F') {
       this.showOther = false;
       this.empSexo = this.checkSexo;
-      console.log(this.empSexo);
+      //console.log(this.empSexo);
     } else if (this.checkSexo === 'otro') {
       this.empSexo = '';
       this.checkSexo = 'otro'
@@ -188,10 +223,10 @@ export class EmpleadosComponent implements OnInit {
       empleadoEstado: this.empEstado
     };
 
-    this.service.addEmpleados(data).subscribe(
+    this.empService.addEmpleados(data).subscribe(
       response => {
         // Manejar la respuesta de la API aquí si es necesario
-        console.log('Empleado agregado exitosamente:', response);
+        //console.log('Empleado agregado exitosamente:', response);
         this.mensajeExito = 'Empleado registrado exitosamente.';
         setTimeout(() => {
           this.mensajeExito = '';
@@ -211,7 +246,7 @@ export class EmpleadosComponent implements OnInit {
   editarEmpleado(id: number) {
     this.empId = id;
 
-    this.service.getEmpleadoById(this.empId).subscribe(
+    this.empService.getEmpleadoById(this.empId).subscribe(
       response => {
         //aunque no se muestren en pantalla todas, guardamos todos los datos que trae nuestra tabla en variables locales para luego usarlas al enviar el put
         this.empIdNomina = response.empleadoIdNomina;
@@ -225,7 +260,7 @@ export class EmpleadosComponent implements OnInit {
         this.empSexo = response.empleadoSexo;
         this.empTelefono = response.empleadoTelefono;
         this.empEstado = response.empleadoEstado;
-        console.log(this.empDpto);
+        //console.log(this.empDpto);
       },
       error => {
         // Manejar cualquier error que ocurra durante la llamada a la API aquí
@@ -255,10 +290,10 @@ export class EmpleadosComponent implements OnInit {
     };
 
     // Llamar al método updateEmpleado() del servicio para enviar los datos actualizados a la API
-    this.service.updateEmpelado(this.empId, data).subscribe(
+    this.empService.updateEmpelado(this.empId, data).subscribe(
       response => {
         // Manejar la respuesta de la API aquí si es necesario
-        console.log('Empleado actualizado exitosamente:', response);
+        //console.log('Empleado actualizado exitosamente:', response);
 
         //muestra mensaje de exito y redirige a la otra vista luego de 1.5 segundo
         this.mensajeExito = 'Empleado editado exitosamente.';
@@ -266,7 +301,7 @@ export class EmpleadosComponent implements OnInit {
           // Restablecer las variables locales a sus valores iniciales
           this.clear();
           this.changeview = 'consulta';
-        }, 1500);
+        }, 3000);
 
         this.ngOnInit();
       },

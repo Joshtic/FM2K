@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, map  } from 'rxjs';
 import { Niveles } from 'src/app/models/Niveles';
-import { CommunicationApiService } from 'src/app/services/communication-api.service';
+import { AreasService } from 'src/app/services/comunicationAPI/seguridad/areas.service';
+import { TipoSolService } from 'src/app/services/comunicationAPI/solicitudes/tipo-sol.service';
+import { NivelRuteoService } from 'src/app/services/comunicationAPI/seguridad/nivel-ruteo.service';
+import { RuteoAreaService } from 'src/app/services/comunicationAPI/seguridad/ruteo-area.service';
+import { DepartamentosService } from 'src/app/services/comunicationAPI/seguridad/departamentos.service';
 
 @Component({
   selector: 'app-ruteo',
@@ -11,6 +15,7 @@ import { CommunicationApiService } from 'src/app/services/communication-api.serv
 export class RuteoComponent implements OnInit {
   //variables que almacenan los datos de los niveles asignados
   rutArea: number = 0;
+  rutDpto: number = 0;
   rutTipoSol: number = 0;
 
   nvNivel: string = '';
@@ -49,15 +54,19 @@ export class RuteoComponent implements OnInit {
   checkNivel: boolean = false;
   getNivelEstado: string = 'A';//variable que controla el estado de los niveles a obtener, 'A' retorna solo estados acivos, 'I' retorna estados inactivos
 
+  departamentos: any[] = [];
 
-  constructor(private service: CommunicationApiService) { }
+
+  constructor(
+    private areaService: AreasService,
+    private tipSolService: TipoSolService,
+    private nivRuteoService: NivelRuteoService,
+    private rutAreaService: RuteoAreaService,
+    private departService: DepartamentosService) { }
 
 
   ngOnInit() {
-    this.areaList$ = this.service.getAreaList();
-    this.TipoSol$ = this.service.getTipoSolicitud();
-    
-    this.nivelRut$ = this.service.getNivelbyEstado(this.getNivelEstado).pipe(
+    this.nivelRut$ = this.nivRuteoService.getNivelbyEstado(this.getNivelEstado).pipe(
       map(niv => niv.sort((a, b) => a.nivel - b.nivel))
     );   
 
@@ -75,15 +84,52 @@ export class RuteoComponent implements OnInit {
       }
     });
 
+    setTimeout(() => {
+      
+      this.areaList$ = this.areaService.getAreaList();
+      this.TipoSol$ = this.tipSolService.getTipoSolicitud();
+  
+      this.departService.getDepartamentos().subscribe(
+        (data: any) => {
+          this.departamentos = data;
+        },
+        error => {
+          console.log("Error al obtener los departamentos: ", error);
+        }
+      );
+      
+    }, 300);
+    
+
   }
+  nivelByDep: any[] = []; 
 
   changeView(view: string): void {
     this.clear();
     if (view == 'eliminar') {
       this.dltArea = this.busqArea;
       this.changeview = view;
+    } else if(view == 'editar'){
+      this.disableDept = true;
+      this.disableSol = true;
+      this.changeview = view;
     }
     this.changeview = view;
+    
+  }
+
+  setNivelestoDlt(){
+    this.nivelByDep = [];
+    //consultar los niveles segun el departamento
+    this.rutAreaService.getRuteoByDepSol(this.dltArea, this.dltTipoSol).subscribe(
+      (data: any) => {
+        this.nivelByDep = data;
+        //console.log("Niveles por departamento: ", this.nivelByDep);
+      },
+      error => {
+        console.log("Error al obtener los niveles por departamento: ", error);
+      }
+    );
   }
 
   cancelar(): void {
@@ -102,6 +148,7 @@ export class RuteoComponent implements OnInit {
     this.dltNivel = 0
     this.dltTipoSol = 0
     this.nvDescp = '';
+    this.rutDpto = 0;
     this.nvNivel = '';
     this.nvEstado = '';
     for (let nivel of this.nivelesList) {
@@ -117,16 +164,16 @@ export class RuteoComponent implements OnInit {
 
   //agrega un ruteo a la tabla, si el ruteo ya existe muestra un mensaje
   guardarRuteo() {
-    console.log("inicio de guardado");
+    //console.log("inicio de guardado");
 
     for (let nivel of this.nivelesList) {
       if (nivel.estado === true) {
 
-        this.service.checkRuteoExistence(this.rutTipoSol, this.rutArea, nivel.nivel).subscribe(
+        this.rutAreaService.checkRuteoExistence(this.rutTipoSol, this.rutDpto, nivel.nivel).subscribe(
           (data: any) => {
             if (data) {
               // Si el ruteo ya existe se guardan los valores de los niveles en una lista para mostrarlos en un mensaje
-              console.log(`El ruteo para el nivel ${nivel.nivel} ya existe.`);
+              //console.log(`El ruteo para el nivel ${nivel.nivel} ya existe.`);
 
               this.nivGuardar = nivel.nivel;
 
@@ -138,26 +185,27 @@ export class RuteoComponent implements OnInit {
                 this.showmsjNivel = false;
                 this.nivGuardados = [];
                 //this.clear();          
-              }, 1800);
+              }, 2000);
 
             } else {
               // Si el ruteo no existe se crea el arreglo y se envia a la API
               const data = {
                 rutareaTipoSol: this.rutTipoSol,
                 rutareaArea: this.rutArea,
+                rutareaDpto: this.rutDpto,
                 rutareaNivel: nivel.nivel
               };
 
 
-              this.service.addRuteos(data).subscribe(
+              this.rutAreaService.addRuteos(data).subscribe(
                 () => {
-                  console.log('Ruteo agregado exitosamente');
+                  //console.log('Ruteo agregado exitosamente');
                   this.mensajeExito = 'Niveles asignados exitosamente.';
                   setTimeout(() => {
                     this.mensajeExito = '';
                     this.clear();
                     this.changeview = 'consultar';
-                  }, 1500);
+                  }, 3000);
                 },
                 error => {
                   this.mensajeError = 'Error intente de nuevo.';
@@ -177,11 +225,23 @@ export class RuteoComponent implements OnInit {
     }
   }
 
+  departamentosFilter: any[] = [];
+  disableDept: boolean = true;
+  disableSol: boolean = true;
+  searchDeptByArea(){
+    this.disableDept = false;
+    this.departamentosFilter = this.departamentos.filter((dept) => dept.depArea == this.rutArea);
+  }
+
+  activeSol(){
+    this.disableSol = false;
+  }
+
   consultarRuteo() {
     this.ruteoList = [];
     this.mensajeError = '';
 
-    this.service.getRuteosByArea(this.busqArea).subscribe(
+    this.rutAreaService.getRuteosByArea(this.busqArea).subscribe(
       response => {
         this.ruteoList = response;
         this.checkBusq = true;
@@ -189,7 +249,7 @@ export class RuteoComponent implements OnInit {
       },
       error => {
         if (error.status == 404) {
-          this.mensajeError = 'No se ha encontrado niveles asignados para esa area.';
+          this.mensajeError = 'No se ha encontrado niveles asignados para ese departamento.';
         } else {
           this.mensajeError = 'Error, no se ha podido consultar los niveles.';
 
@@ -214,16 +274,16 @@ export class RuteoComponent implements OnInit {
 
     //evalua si el nivel ya existe y muestra una respuesta
     if (this.nvRepetido) {
-      console.log("condicion, nivel repetido: ", parseInt(this.nvNivel));
+      //console.log("condicion, nivel repetido: ", parseInt(this.nvNivel));
       this.mensajeError = 'El nivel ya existe, ingrese otro valor.';
       setTimeout(() => {
         this.mensajeError = '';
         this.nvNivel = '';
         this.nvRepetido = false;
-      }, 1000);
+      }, 3000);
 
     } else {
-      console.log("else, nivel nuevo: ", parseInt(this.nvNivel, 10));
+      //console.log("else, nivel nuevo: ", parseInt(this.nvNivel, 10));
 
       const data = {
         nivel: this.nvNivel,
@@ -231,9 +291,9 @@ export class RuteoComponent implements OnInit {
         estadoRuteo: this.nvEstado
       }
 
-      this.service.addnivelRuteo(data).subscribe(
+      this.nivRuteoService.addnivelRuteo(data).subscribe(
         response => {
-          console.log("Nivel añadido correctamente.");
+          //console.log("Nivel añadido correctamente.");
           this.mensajeExito = 'Nivel registrado exitosamente.';
           setTimeout(() => {
             this.mensajeExito = '';
@@ -241,14 +301,14 @@ export class RuteoComponent implements OnInit {
             this.ngOnInit();
             this.changeview = 'consultar';
 
-          }, 1500);
+          }, 3000);
         },
         error => {
           this.mensajeError = 'Error intente de nuevo.';
           setTimeout(() => {
             this.mensajeError = '';
             this.clear();
-          }, 1500);
+          }, 3000);
           console.log("Error al añadir el nivel: ", error);
         }
       );
@@ -257,13 +317,13 @@ export class RuteoComponent implements OnInit {
   }
 
   borrarRuteo(): void {
-    this.service.deleteRuteo(this.dltTipoSol, this.dltArea, this.dltNivel).subscribe(
+    this.rutAreaService.deleteRuteo(this.dltTipoSol, this.dltArea, this.dltNivel).subscribe(
       response => {
         this.mensajeExito = 'Se ha eliminado el nivel seleccionado.';
         setTimeout(() => {
           this.mensajeExito = '';
           this.changeview = 'consultar';
-        }, 1500);
+        }, 3000);
       },
       error => {
 
@@ -276,7 +336,7 @@ export class RuteoComponent implements OnInit {
         console.log("Error: ", error)
         setTimeout(() => {
           this.mensajeError = '';
-        }, 2500);
+        }, 3000);
       }
     );
     

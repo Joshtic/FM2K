@@ -1,0 +1,62 @@
+<div class="row justify-content-between">
+  <div class="custom-input-group" *appAuthorize="'38'">
+    <label for="inputFile" class="custom-label">
+        <i class="bi bi-upload"></i>
+    </label>
+    <input
+        id="inputFile"
+        type="file"
+        accept=".pdf, .PDF, .png, .jpg, .jpeg, .docx, .doc, .xlsx"
+        class="custom-input"
+        id="inputFile"
+        (change)="getFiles($event)"
+        [appSecureDisable]="estadoSol"
+    />
+    <button class="custom-button" (click)="sendfile()" [appSecureDisable]="estadoSol">
+        <i class="bi bi-upload"></i> Subir
+    </button>
+  </div>
+  <div class="col-2 w-2">
+    <button *ngIf="!view "  class="btn btn-success" (click)="allDownload()">Descargar</button>
+  </div>
+</div>
+<div class="file-tip"><h5  class="tip">Tipos de archivos admitidos: .pdf, .PDF, .doc, .docx, .jpg, .jpeg, .png, .xlsx</h5></div>
+<div>
+  <div *ngIf="showExito" class="alert alert-success text-center" role="alert">
+    <span
+      ><i class="bi bi-upload"> {{ msjExito }}</i></span
+    >
+  </div>
+  <div *ngIf="showError" class="alert alert-danger text-center" role="alert">
+    <span
+      ><i class="bi bi-x-circle"> {{ msjError }}</i></span
+    >
+  </div>
+</div>
+
+<!--  Visualizar PDF  -->
+<div class="ini m-3">
+  <ng-container *ngFor="let pat of paths">
+    <div class="text-center documentos">
+      <div class="text-end">
+        <a (click)="deleteFile(pat.docUrlComleta)"
+          ><i class="bi bi-x-lg"></i
+        ></a>
+      </div>
+
+      <a href="{{ pat.docUrl }}" target="_blank">
+        <img
+          src="{{pat.docImage}}"
+          width="100"
+          alt="..."
+        />
+        <h5>{{ pat.docNombre }}</h5>
+        <a
+          class="link-primary"
+          (click)="DowmloadFile(pat.docUrl, pat.docNombre)"
+          >Descargar</a
+        >
+      </a>
+    </div>
+  </ng-container>
+</div>

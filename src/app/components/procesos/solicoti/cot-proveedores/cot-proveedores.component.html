@@ -1,0 +1,463 @@
+<div class=" mb-2 text-center">
+    <div class="tabs-edit">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': actionProv === 'consultar'}"
+                    (click)="selectAction('consultar')" (click)="getProvCotizacion()">Proveedores asignados</a>
+            </li>
+
+            <!-- modificar para que no se puedan asignar proveedores en caso de que la solicitud ya ha sido enviada -->
+
+            <li class="nav-item" *appAuthorize="'37'">
+                <a class="nav-link" [ngClass]="{'active': actionProv === 'agregar'}"
+                    (click)="selectAction('agregar')">Asignar proveedores</a>
+            </li>
+
+
+        </ul>
+    </div>
+</div>
+
+<ng-container *appAuthorize="'37'">
+    <div class="proveedores mb-2 " *ngIf="actionProv == 'agregar'">
+        <div class="row p-3">
+            <div class="busqProveedor row col">
+                <div class="input-group col">
+                    <select class="form-select custom-select" [(ngModel)]="tipoBusqProv" name="buscarOpcion"
+                        style="background-color: #d6d6d6;" [appSecureDisable]="estadoSol">
+                        <option selected value="nombre">Nombre del proveedor</option>
+                        <option value="ruc">Ruc del proveedor</option>
+                    </select>
+                    <input type="text" class="form-control" placeholder="Término de busqueda" name="terminoBusqueda"
+                        [(ngModel)]="terminoBusq" [appSecureDisable]="estadoSol">
+                    <button class="btn btn-success" type="button" (click)="searchProveedor()" [appSecureDisable]="estadoSol">
+                        <i class="bi bi-search"> Buscar</i></button>
+
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#newProveedor" [appSecureDisable]="estadoSol"><i
+                            class="bi bi-plus-circle"> Nuevo proveedor</i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="busqueda_prov p-3">
+            <div *ngIf="showmsj" class="alert alert-danger text-center" role="alert">
+                <span><i class="bi bi-exclamation-triangle-fill"> {{ msjError }}</i></span>
+            </div>
+            <div *ngIf="showadv" class="alert alert-warning text-center" role="alert">
+                <span><i class="bi bi-exclamation-circle-fill"> {{ msjError }}</i></span>
+            </div>
+            <div *ngIf="isSearched" class="alert alert-primary text-center" role="alert">
+                <span><i class="bi bi-info-circle"> Busque un proveedor para añadirlo a la solicitud o agregue uno
+                        nuevo.</i></span>
+            </div>
+            <div *ngIf="proveedoresList.length != 0" class="align-items-center input-group mb-1 justify-content-end">
+                <button class="btn btn-primary" (click)="prevPage()"><i class="bi bi-arrow-left"></i></button>
+                <button class="btn btn-primary" (click)="nextPage()"><i class="bi bi-arrow-right"></i></button>
+            </div>
+            <table *ngIf="proveedoresList.length != 0"
+                class="table table-bordered text-center table-hover table-rounded">
+                <thead>
+                    <tr>
+                        <th class="align-middle">Ruc</th>
+                        <th class="align-middle">Nombre</th>
+                        <th class="align-middle">Teléfono</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let prov of proveedoresList | paginate: { itemsPerPage: 7, currentPage: page }"
+                        (click)="selectProveedor(prov)" (click)="selectProveedor(prov)">
+                        <td class="align-middle">{{prov.prov_ruc}}</td>
+                        <td class="align-middle">{{prov.prov_nombre}}</td>
+                        <td class="align-middle">{{prov.prov_telefono}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- <pagination-controls class="text-end" *ngIf="proveedoresList$" (pageChange)="page = $event"></pagination-controls> -->
+        </div>
+        <div class="selected-prov p-3" *ngIf="proveedorListSelected.length != 0">
+            <h3>Proveedores seleccionados</h3>
+            <table class="table table-striped table-bordered text-center table-rounded">
+                <thead>
+                    <tr>
+                        <th class="align-middle">Ruc</th>
+                        <th class="align-middle" style="width: 20%;">Nombre</th>
+                        <th class="align-middle">Teléfono*</th>
+                        <th class="align-middle">Correo*</th>
+                        <th class="align-middle">Dirección</th>
+                        <th class="align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr *ngFor="let prov of proveedorListSelected let i=index">
+
+                        <td class="align-middle">{{prov.ruc}}</td>
+                        <td class="align-middle">{{prov.nombre}}</td>
+                        <td class="align-middle">
+                            <input type="text" class="form-control" placeholder="Ingrese el teléfono"
+                                [(ngModel)]="prov.telefono">
+                        </td>
+                        <td class="align-middle">
+                            <input type="email" class="form-control" placeholder="Ingrese el correo"
+                                [(ngModel)]="prov.correo" (keyup)="validarProvEmail(i)">
+                            <span class="text-danger tip" *ngIf="!prov.validEmail">El correo electrónico no es
+                                válido.</span>
+                        </td>
+                        <td class="align-middle">
+                            <input type="text" class="form-control" placeholder="Ingrese la dirección"
+                                [(ngModel)]="prov.direccion">
+                        </td>
+                        <td class="align-middle">
+                            <a class="btn-prov" (click)="deleteProvSelected(i)"><i
+                                    class="bi bi-x-circle-fill text-danger m-1"></i></a>
+                            <!-- <a class="btn-prov" data-toggle="modal" data-target="#senMailtoProv" (click)="sendMailtoProv()">
+                                <i class="bi bi-envelope-fill text-success  m-1"></i></a> -->
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div class="text-end">
+                <p class="tip">*Campos obligatorios</p>
+            </div>
+        </div>
+        <div class="p-2 text-end" *ngIf="proveedorListSelected.length != 0">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#saveProvCot">Guardar proveedores</button>
+        </div>
+
+    </div>
+</ng-container>
+
+
+<!-- lista de los proveedores ya asignados a la solicitud -->
+<div class="proveedores mb-2 " *ngIf="actionProv == 'consultar'">
+    <div class="selected-prov p-3">
+        <table class="table table-striped table-bordered text-center table-rounded">
+            <thead>
+                <tr>
+                    <th class="align-middle">Ruc</th>
+                    <th class="align-middle" style="width: 20%;">Nombre</th>
+                    <th class="align-middle">Teléfono*</th>
+                    <th class="align-middle">Correo*</th>
+                    <th class="align-middle">Dirección</th>
+                    <th class="align-middle" *appAuthorize="'64'">Verificado</th> <!-- AGREGAR TRANSACCION DE VERIFICAR PROVEEDOR -->
+                    <th class="align-middle" *appAuthorize="'65'">Eliminar</th> <!-- AGREGAR TRANSACCION DE ELIMINAR PROVEEDOR -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngIf="!hasProvs">
+                    <td class="align-middle text-danger" colspan="7">No hay proveedores asignados para esta solicitud
+                    </td>
+                </tr>
+                <tr *ngFor="let prov of assignedProvs$ | async">
+                    <td class="align-middle">{{prov.cotProvRuc}}</td>
+                    <td class="align-middle">{{prov.cotProvNombre}}</td>
+                    <td class="align-middle">{{prov.cotProvTelefono}}</td>
+                    <td class="align-middle">{{prov.cotProvCorreo}}</td>
+                    <td class="align-middle">{{prov.cotProvDireccion}}</td>
+                    <td class="align-middle" *appAuthorize="'64'" [ngSwitch]="prov.cotProvVerify"><!-- AGREGAR TRANSACCION DE VERIFICAR PROVEEDOR -->
+                        <span *ngSwitchCase="1">Verificado</span>
+                        <span *ngSwitchCase="0">Nuevo Proveedor<br><a class="link-primary link-underline a-verify"
+                                data-toggle="modal" data-target="#verifyProvAssigned"
+                                (click)="setProvId(prov.cotProvId)">Verificar</a></span>
+                    </td>
+                    <td class="align-middle" *appAuthorize="'65'"> <!-- AGREGAR TRANSACCION DE ELIMINAR PROVEEDOR -->
+                        <button class="btn btn-border btn-prov" data-toggle="modal" data-target="#deleteProvAssigned"
+                            (click)="selectIdDltProv(prov.cotProvId)" [appSecureDisable]="estadoSol">
+                            <i class="bi bi-x-circle-fill text-danger m-3"></i></button>
+                        <!-- <a class="btn-prov" data-toggle="modal" data-target="#senMailtoProv"
+                            (click)="selectEmailProv(prov.cotProvCorreo, prov.cotProvNombre)">
+                            <i class="bi bi-envelope-fill text-success  m-3"></i></a> -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- envia los correos a todos los proveedores -->
+        <div class="text-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#senMailtoProv" (click)="saveDataProv()"
+                [appSecureDisable]="estadoSol" *appAuthorize="'47'">Enviar correos</button>
+        </div>
+    </div>
+    <!-- Mensaje de exito o error de envio de correo -->
+    <div>
+        <div *ngIf="showmsj" class="alert alert-success alert-message" role="alert">
+            <span><i class="bi bi-check-circle-fill"> {{ msjExito }}</i></span>
+        </div>
+        <div *ngIf="showmsjerror" class="alert alert-danger alert-message" role="alert">
+            <span><i class="bi bi-exclamation-triangle-fill"> {{ msjError }}</i></span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para guardar los proveedores seleccionados en la base de datos-->
+<div class="modal fade" id="saveProvCot" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h3 class="font-weight-bold" id="exampleModalLabel">
+                    Guardar proveedores
+                </h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea asignar los proveedores seleccionados a esta solicitud de cotización?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="saveProvDB()">
+                    Confirmar
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para verificar un proveedor asignado -->
+<div class="modal fade" id="verifyProvAssigned" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h3 class="font-weight-bold" id="exampleModalLabel">
+                    Verificar proveedor asignado
+                </h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro(a) que desea verificar el proveedor?<br>Al verificar el proveedor dejará de ser
+                    proveedor nuevo.<br>Advertencia: debe asegurarse de haber agregado el proveedor al servidor AX
+                    anteriormente, esa acción no corresponde a esta aplicación.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="changeVerifyProv()">
+                    Confirmar
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para eliminar un proveedor ya asignado -->
+<div class="modal fade" id="deleteProvAssigned" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h3 class="font-weight-bold" id="exampleModalLabel">
+                    Eliminar proveedor asignado
+                </h3>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro(a) que desea eliminar el proveedor?<br>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="deleteProvAssigned()">
+                    Confirmar
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para enviar correo al proveedor-->
+<div class="modal fade" id="senMailtoProv" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h3 class="font-weight-bold" id="exampleModalLabel">
+                    Enviar correo al Proveedor Seleccionado
+                </h3>
+            </div>
+            <div class="modal-body">
+
+                <div class="sol-cot-template" #solCotTemplate>
+                    <div>
+                        <h2>FUNDACION MALECON 2000</h2>
+                        <h3>SOLICITUD DE COTIZACION</h3>
+                    </div>
+                    <div>
+                        <div class="input-group text-end mb-2">
+                            <label class="input-group-text" for="fecha">Fecha:</label>
+                            <input class="form-control" type="text" name="fecha" [value]="sol_fecha" disabled>
+
+                        </div>
+                        <div class="input-group text-end mb-2">
+                            <label class="input-group-text" for="asunto">Descripción:</label>
+                            <input class="form-control" type="text" name="asunto" [value]="cabSolCotAsunto" disabled>
+
+                        </div>
+
+                        <div>
+                            <table class="table table-bordered table-rounded">
+                                <thead>
+                                    <tr>
+                                        <th class="align-middle">Item</th>
+                                        <th class="align-middle">Descripcion</th>
+                                        <th class="align-middle">Unidad</th>
+                                        <th class="align-middle">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let det of mail_detalles let i=index">
+                                        <td class="align-middle">{{i+1}}</td>
+                                        <td class="align-middle">{{det.solCotDescripcion}}</td>
+                                        <td class="align-middle">{{det.solCotUnidad}}</td>
+                                        <td class="align-middle">{{det.solCotCantidadTotal}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="sendMailtoProv()">
+                    Confirmar
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para crear nuevo proveedor-->
+<div class="modal fade" #newProveedorModal id="newProveedor" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h3 class="font-weight-bold" id="exampleModalLabel">
+                    Agregar un nuevo proveedor
+                </h3>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="dataForm" >
+                    <div class="row mb-2">
+                        <div class="input-group col">
+                            <label class="input-group-text" for="ruc">Ruc*:</label>
+                            <input type="text" class="form-control" name="ruc"
+                                placeholder="Ingrese el ruc del nuevo proveedor" formControlName="newRuc">
+                        </div>
+                        <div class="input-group col">
+                            <label class="input-group-text" for="nombre">Nombre*:</label>
+                            <input type="text" class="form-control" name="nombreprv"
+                                placeholder="Ingrese el nombre del nuevo proveedor" formControlName="newNombre">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-text text-danger col"
+                            *ngIf="Ruc.errors?.['required'] && (Ruc.touched || Ruc.dirty)">
+                            Ingrese el número de Ruc del proveedor.
+                        </div>
+                        <div class="form-text text-danger col"
+                            *ngIf="Nombre.errors?.['required'] && (Nombre.touched || Nombre.dirty)">
+                            Ingrese el nombre del proveedor.
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="input-group col">
+                            <label class="input-group-text" for="phone">Teléf.*:</label>
+                            <select class="form-select" name="pais" formControlName="newCodePhone">
+                                <option value="54">Argentina (+54)</option>
+                                <option value="591">Bolivia (+591)</option>
+                                <option value="55">Brasil (+55)</option>
+                                <option value="56">Chile (+56)</option>
+                                <option value="57">Colombia (+57)</option>
+                                <option value="506">Costa Rica (+506)</option>
+                                <option value="53">Cuba (+53)</option>
+                                <option value="1-809">República Dominicana (+1-809)</option>
+                                <option value="1-829">República Dominicana (+1-829)</option>
+                                <option value="1-849">República Dominicana (+1-849)</option>
+                                <option value="593">Ecuador (+593)</option>
+                                <option value="503">El Salvador (+503)</option>
+                                <option value="1">Estados Unidos / Canadá (+1)</option>
+                                <option value="502">Guatemala (+502)</option>
+                                <option value="504">Honduras (+504)</option>
+                                <option value="52">México (+52)</option>
+                                <option value="505">Nicaragua (+505)</option>
+                                <option value="507">Panamá (+507)</option>
+                                <option value="595">Paraguay (+595)</option>
+                                <option value="51">Perú (+51)</option>
+                                <option value="1-787">Puerto Rico (+1-787)</option>
+                                <option value="1-939">Puerto Rico (+1-939)</option>
+                                <option value="598">Uruguay (+598)</option>
+                                <option value="58">Venezuela (+58)</option>
+                            </select>
+
+                            <input type="text" class="form-control" name="phone"
+                                placeholder="Ingrese el teléfono del nuevo proveedor" formControlName="newPhone">
+
+                        </div>
+                        <div class="input-group col">
+                            <label class="input-group-text" for="address">Dirección:</label>
+                            <input type="text" class="form-control" name="address"
+                                placeholder="Ingrese la dirección del nuevo proveedor" formControlName="newDireccion">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-text text-danger"
+                                *ngIf="Phone.errors?.['required'] && (Phone.touched || Phone.dirty)">
+                                Ingrese un número de teléfono.
+                            </div>
+                            <div class="form-text text-danger"
+                                *ngIf="Phone.errors?.['pattern'] && (Phone.touched || Phone.dirty)">
+                                Ingrese un número de teléfono válido.
+                            </div>
+                            <div class="form-text text-danger"
+                                *ngIf="Phone.errors?.['maxlength'] || Phone.errors?.['minlength']">
+                                El teléfono debe tener 10 caracteres de longitud.
+                            </div>
+                        </div>
+                        <div class="form-text text-danger col"
+                            *ngIf="Direccion.errors?.['required'] && (Direccion.touched || Direccion.dirty)">
+                            Ingrese la dirección del proveedor.
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-2">
+                        <label class="input-group-text" for="correo">Correo*:</label>
+                        <input type="email" class="form-control" name="correo"
+                            placeholder="Ingrese el correo del nuevo proveedor" formControlName="newEmail">
+                    </div>
+                    <div class="form-text text-danger"
+                        *ngIf="Email.errors?.['required'] && (Email.touched || Email.dirty)">
+                        Ingrese un correo electrónico.
+                    </div>
+                    <div class="form-text text-danger"
+                        *ngIf="Email.errors?.['email'] && (Email.touched || Email.dirty)">
+                        Ingrese un correo electrónico válido.
+                    </div>
+                    <div class="text-end">
+                        <p class="tip">*Campos obligatorios</p>
+                    </div>
+                </form>
+                <button type="button" class="btn btn-success"  [disabled]="!FormularioVacio()"  (click)="addProveedor()"  #miModal>
+                    Agregar Proveedor
+                </button>
+            </div>
+            <div *ngIf="showmsjerror" class="alert alert-danger text-center" style="width: 50%; margin: 0 auto;"  role="alert">
+                <span><i class="bi bi-exclamation-triangle-fill"> {{ msjError }}</i></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="clearNewPrv()">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

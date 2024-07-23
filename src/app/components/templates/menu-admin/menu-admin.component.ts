@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { GlobalService } from 'src/app/services/global.service'; 
 import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-menu-admin',
@@ -8,32 +9,38 @@ import { Router } from '@angular/router';
   styleUrls: ['./menu-admin.component.css']
 })
 export class MenuAdminComponent {
-  appSelected: boolean = false;
+  userName: string = this.cookieService.get('userName');
   isLogin: boolean = false;
   showSB: boolean = false;
 
-  constructor(private globalService: GlobalService,private router: Router) { }
+  constructor(private globalService: GlobalService,
+    private router: Router, 
+    private cookieService: CookieService) { }
 
   isSidebarVisible = false;
 
   toggleSidebar() {
     this.showSB = !this.showSB;
   }
-  
-  ngOnInit():void{
-    this.appSelected  = this.globalService.appSelected;
-    this.isLogin = this.globalService.isLogin;
-  }
 
+  //modificar variable que muestra o no la barra de busqueda
   backToMain():void{
-    this.globalService.appSelected = false;
+    //this.globalService.toggleAppSelected();
+    //this.globalService.appSelected = false;
 
     this.router.navigate(['main']);
   }
 
   logOut(){
-    this.globalService.isLogin = false;
+    this.cookieService.delete('authToken');
+    this.cookieService.delete('userLogin');
+    this.cookieService.delete('userIdNomina');
+    this.cookieService.delete('userName');
+    this.cookieService.delete('userTransactions');
+    this.cookieService.delete('userRoles');
+    this.cookieService.delete('userArea');
     this.router.navigate(['login']);
+    //console.log('Token vacio', this.cookieService.get('authToken'))
 
   }
 }
