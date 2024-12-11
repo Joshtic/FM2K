@@ -1,7 +1,7 @@
 .container {
     width: 70%;
     margin: 0 auto;
-    padding-top: 25px;
+    padding-top: 120px;
 }
 
 .cmp-form {
@@ -27,5 +27,8 @@
 }
 
 a:hover {
+    cursor: pointer;
+}
+.table-hover tbody tr:hover {
     cursor: pointer;
 }

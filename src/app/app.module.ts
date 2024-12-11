@@ -1,7 +1,15 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule,HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgxPaginationModule } from 'ngx-pagination';
+//Dependencias  Angular PDF View
+//Material UI Angular
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+//-------
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
+
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -23,10 +31,57 @@ import { SolipagoComponent } from './components/procesos/solipago/solipago.compo
 import { MainSeguridadComponent } from './components/seguridad/main-seguridad.component';
 import { MainConfiguracionComponent } from './components/configuracion/main-configuracion.component';
 import { MenuComponent } from './components/templates/menu/menu.component';
-import { CommunicationApiService } from './services/communication-api.service';
 import { MenuAdminComponent } from './components/templates/menu-admin/menu-admin.component';
 import { AllrequestComponent } from './components/procesos/allrequest/allrequest.component';
 import { BreadcrumbComponent } from './components/templates/breadcrumb/breadcrumb.component';
+import { AuthService } from './services/authentication/auth.service';
+import { CotProveedoresComponent } from './components/procesos/solicoti/cot-proveedores/cot-proveedores.component';
+import { CotDocumentacionComponent } from './components/procesos/solicoti/cot-documentacion/cot-documentacion.component';
+import { OCDocumentacionComponent } from './components/procesos/solioc/oc-documentacion/oc-documentacion.component';
+import { SPDocumentacionComponent } from './components/procesos/solipago/sp-documentacion/sp-documentacion.component';
+import { AppAuthorizeTransactionDirective } from './directives/app-authorize-transaction.directive';
+import { AppDisableSecureDirective } from './directives/app-disable-secure.directive';
+import { MainNominaComponent } from './nomina/components/main/main-nomina/main-nomina.component';
+import { SendNominaRolComponent } from './nomina/components/procesos/send-nomina-rol/send-nomina-rol.component';
+import { MenuNominaComponent } from './components/templates/menu-nomina/menu-nomina.component';
+
+import { SpDestinoComponent } from './components/procesos/solipago/sp-destino/sp-destino.component';
+import { RolesTransacComponent } from './components/seguridad/roles-transac/roles-transac.component';
+import { RolesUsersComponent } from './components/seguridad/roles-users/roles-users.component';
+import { CotPdfComponent } from './components/procesos/solicoti/cot-pdf/cot-pdf.component';
+import { CotAnulacionComponent } from './components/procesos/solicoti/cot-anulacion/cot-anulacion.component';
+import { OcAnulacionComponent } from './components/procesos/solioc/oc-anulacion/oc-anulacion.component';
+import { SpAnulacionComponent } from './components/procesos/solipago/sp-anulacion/sp-anulacion.component';
+import { OcPdfComponent } from './components/procesos/solioc/oc-pdf/oc-pdf.component';
+import { SpPdfComponent } from './components/procesos/solipago/sp-pdf/sp-pdf.component';
+import { EmpleadoNivelComponent } from './components/seguridad/empleado-nivel/empleado-nivel.component';
+import { DialogComponentComponent } from './components/templates/dialog-component/dialog-component.component';
+import { SolicitudesAprobadasComponent } from './components/procesos/solicitudes-aprobadas/solicitudes-aprobadas.component';
+import { DialogServiceService } from './services/dialog-service.service';
+import { ReportesComponent } from './components/procesos/reportes/reportes.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatListModule} from '@angular/material/list';
+import {MatDividerModule} from '@angular/material/divider';
+
+//COMUNICACION INTERNA//
+import { MatCardModule } from '@angular/material/card';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { SolicitudEventoComponent } from './comint/components/procesos/solicitud-evento/solicitud-evento.component';
+import { SolicitudEventoListComponent } from './comint/components/procesos/solicitud-evento-list/solicitud-evento-list.component';
+import { AlertaEventoComponent } from './comint/components/procesos/alerta-evento/alerta-evento.component';
+import { AlertaEventoListComponent } from './comint/components/procesos/alerta-evento-list/alerta-evento-list.component';
+import { MainComintComponent } from './comint/components/templates/main-comint/main-comint.component';
+import { MenuComintComponent } from './comint/components/templates/menu-comint/menu-comint.component';
+
 
 @NgModule({
   declarations: [
@@ -49,7 +104,35 @@ import { BreadcrumbComponent } from './components/templates/breadcrumb/breadcrum
     MenuComponent,
     MenuAdminComponent,
     AllrequestComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    CotProveedoresComponent,
+    CotDocumentacionComponent,
+    OCDocumentacionComponent,
+    SPDocumentacionComponent,
+    AppAuthorizeTransactionDirective,
+    AppDisableSecureDirective,
+    SpDestinoComponent,
+    RolesTransacComponent,
+    RolesUsersComponent,
+    CotPdfComponent,
+    CotAnulacionComponent,
+    OcAnulacionComponent,
+    SpAnulacionComponent,
+    OcPdfComponent,
+    SpPdfComponent,
+    EmpleadoNivelComponent,
+    DialogComponentComponent,
+    ReportesComponent,
+    SolicitudesAprobadasComponent,
+    MainNominaComponent,
+    SendNominaRolComponent,
+    MenuNominaComponent,
+    SolicitudEventoComponent,
+    SolicitudEventoListComponent,
+    AlertaEventoComponent,
+    AlertaEventoListComponent,
+    MainComintComponent,
+    MenuComintComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,9 +141,26 @@ import { BreadcrumbComponent } from './components/templates/breadcrumb/breadcrum
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatSlideToggleModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatCardModule,
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatTabsModule,
+    MatListModule,
+    MatDividerModule
   ],
-  providers: [CommunicationApiService],
+  providers: [AuthService, MatDialog, DialogServiceService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

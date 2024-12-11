@@ -1,0 +1,27 @@
+.container {
+    width: 70%;
+    margin: 0 auto;
+    padding-top: 120px;
+    padding-bottom: 50px;
+}
+
+.trsc-table{
+    width: 50%;
+    margin: 0 auto;
+    padding-top: 25px;
+}
+
+.form-rol {
+    width: 40%;
+    margin: 0 auto;
+    padding-top: 15px;
+}
+
+.tr-trsc:hover{
+    cursor: pointer;
+}
+ div .alert {
+        margin: 0 auto ;
+        width:25rem  ;
+    
+}

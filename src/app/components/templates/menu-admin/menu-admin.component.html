@@ -1,40 +1,65 @@
-<header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
-    <div class="header-container">
-      <button *ngIf="appSelected" class="btn btn-primary mr-3" (mouseenter)="toggleSidebar()" (click)="toggleSidebar()"><i
-          class="bi bi-list h5"></i></button>
-      <img src="../../../../assets/img/logo.png" alt="logo" class="logo">
+<!-- <header>
+  <nav class="navbar navbar-expand-lg  justify-content-between">
+    <div class="header-container d-flex">
+      <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo"></a>
     </div>
 
-    <form *ngIf="appSelected" class="form-inline">
-      <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-    </form>
-    <div *ngIf="isLogin">
-      <button class="btn btn-primary mr-5">FAQ</button>
-      <button class="btn btn-primary ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+    <div>
+      
+      <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
           class="bi bi-person-circle"></i></button>
     </div>
   </nav>
-</header>
-<div class="sidebar" [ngClass]="{'show': showSB, 'hide': !showSB}">
+  
+  <p class="text-end" style="font-style: italic; color: white; margin-bottom: 0px !important;">Bienvenido: {{userName}}</p>
+</header> -->
+
+<mat-toolbar class="toolbar-custom">
+  <div class="header-container">
+    <!-- <button  class="btn btn-primary mr-3"   (click)="toggleSidebar()"><i class="bi bi-list h5"></i></button> -->
+    <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo" width="200"></a>
+  </div>
+  <span class="example-spacer"></span>
+  <div>
+    <!-- <button mat-raised-button class="mr-5" (mouseover)="showString()" (click)="getUserManual()"><i
+        class="bi bi-filetype-pdf h5 text-danger"></i>{{manualString}}</button> -->
+
+    <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+        class="bi bi-person-circle"></i></button>
+  </div>
+
+</mat-toolbar>
+<p class="username-header">Bienvenido: {{userName}}</p>
+
+
+<div class="sidebar" >
   <ul class="nav flex-column">
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle btn " href="#" id="configuracionDropdown" role="button"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Seguridad
-      </a>
-      <div class="dropdown-menu" aria-labelledby="configuracionDropdown">
-        <a class="dropdown-item" routerLink="/rol">Roles</a>
-        <a class="dropdown-item" routerLink="/users">Usuarios</a>
-        <a class="dropdown-item" routerLink="/apps">Aplicaciones</a>
-        <a class="dropdown-item" routerLink="/functions">Funciones</a>
-        <a class="dropdown-item" routerLink="/transact">Transacciones</a>
+    <li class="nav-item dropdown" *appAuthorize="'41'">
+      <button mat-stroked-button>
+        Mantenimiento
+      </button>
+      <div class="menu" >
+        <a class="item" mat-button routerLink="/rol" *appAuthorize="'2'">Roles</a>
+        <a class="item" mat-button routerLink="/users" *appAuthorize="'6'">Usuarios</a>
+        <a class="item" mat-button routerLink="/empleados" *appAuthorize="'10'">Empleados</a>
+        <a class="item" mat-button routerLink="/apps" *appAuthorize="'14'">Aplicaciones</a>
+        <!-- <a class="dropdown-item" routerLink="/functions">Funciones</a> -->
+        <a class="item" mat-button  routerLink="/transact" *appAuthorize="'18'">Transacciones</a>
+        <a class="item" mat-button routerLink="/empnivel" *appAuthorize="'68'">Empleado-Nivel</a>
+      </div>
+    </li>
+    <li class="nav-item dropdown" *appAuthorize="'51'">
+      <button mat-stroked-button>
+        Autorización
+      </button>
+      <div class="menu" >
+        <a class="item" mat-button  routerLink="/rolTransc" *appAuthorize="'49'">Roles-Transacciones</a>
+        <a class="item" mat-button  routerLink="/rolUser" *appAuthorize="'48'">Roles-Usuarios</a>
       </div>
     </li>
   </ul>
-  <div class="text-center mt-5">
-    <button class="btn btn-primary" (click)="backToMain()">Regresar</button>
+  <div class="regresar">
+    <button class="back-button" mat-raised-button onclick="history.back()"><i class="bi bi-arrow-left h4"></i></button> 
   </div>
 </div>
 <!-- <nav class="sidebar" *ngIf="appSelected">

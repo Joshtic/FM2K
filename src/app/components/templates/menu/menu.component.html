@@ -1,100 +1,113 @@
-<header>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
-    <div class="header-container d-flex">
-      <button *ngIf="appSelected" class="btn btn-primary mr-3"  (mouseenter)="toggleSidebar()" (click)="toggleSidebar()"><i class="bi bi-list h5"></i></button>
-      <img src="../../../../assets/img/logo.png" alt="logo" class="logo">
-    </div>
+<div class="menu-principal">
 
-    <form *ngIf="appSelected" class="form-inline">
-      <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-    </form>
-    <div *ngIf="isLogin">
-      <button class="btn btn-primary mr-5">FAQ</button>
-      <button class="btn btn-primary ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+  <!-- <header>
+    <nav class="navbar navbar-expand-lg  justify-content-between">
+      <div class="header-container d-flex">
+        <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo"></a>
+      </div>
+  
+      <div>
+        <button mat-raised-button class="mr-5" (mouseover)="showString()" (click)="getUserManual()"><i class="bi bi-filetype-pdf h5 text-danger"></i>{{manualString}}</button>
+        
+        <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+            class="bi bi-person-circle"></i></button>
+      </div>
+    </nav>
+    
+    <p class="text-end" style="font-style: italic; color: white; margin-bottom: 0px !important;">Bienvenido: {{userName}}</p>
+  </header> -->
+
+  <mat-toolbar class="toolbar-custom">
+    <div class="header-container">
+      <!-- <button  class="btn btn-primary mr-3"   (click)="toggleSidebar()"><i class="bi bi-list h5"></i></button> -->
+      <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo" width="200"></a>
+    </div>
+    <span class="example-spacer"></span>
+    <div>
+      <button mat-raised-button class="mr-5" (mouseover)="showString()" (click)="getUserManual()"><i
+          class="bi bi-filetype-pdf h5 text-danger"></i>{{manualString}}</button>
+  
+      <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
           class="bi bi-person-circle"></i></button>
     </div>
-  </nav>
   
-</header>
-<div class="sidebar" [ngClass]="{'show': showSB, 'hide': !showSB}">
-  <ul class="nav flex-column">
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle btn " href="#" id="configuracionDropdown" role="button"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Configuración
-      </a>
-      <div class="dropdown-menu" aria-labelledby="configuracionDropdown">
-        <a class="dropdown-item" routerLink="/empleados">Empleados</a>
-        <a class="dropdown-item" routerLink="/ruteo">Ruteo</a>
-        <a class="dropdown-item" routerLink="/documentos">Documentos</a>
-      </div>
-    </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle btn " href="#" id="configuracionDropdown" role="button"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Procesos
-      </a>
-      <div class="dropdown-menu" aria-labelledby="configuracionDropdown">
-        <a class="dropdown-item" routerLink="/solicoti">Solicitud de cotizacion</a>
-        <a class="dropdown-item" routerLink="/solioc">Solicitud de O/C</a>
-        <a class="dropdown-item" routerLink="/solipago">Solicitud de pago</a>
-        <a class="dropdown-item" routerLink="/allrequest">Todas las solicitudes</a>
-        <a class="dropdown-item" routerLink="norute">Solicitudes abiertas</a>
-        <a class="dropdown-item" routerLink="norute">Solicitudes no aprobadas</a>
-      </div>
-    </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle btn " href="#" id="configuracionDropdown" role="button"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Consultas
-      </a>
-      <div class="dropdown-menu" aria-labelledby="configuracionDropdown">
-        <a class="dropdown-item" routerLink="norute">Consulta 1</a>
-        <a class="dropdown-item" routerLink="norute">Consulta 2</a>
-        <a class="dropdown-item" routerLink="norute">Consulta 3</a>
-      </div>
-    </li>
-    
-  </ul>
-  <div class="text-center mt-5">
-    <button class="btn btn-primary" (click)="backToMain()">Regresar</button>
-  </div>
-</div>
+  </mat-toolbar>
+  <p class="username-header">Bienvenido: {{userName}}</p>
 
 
-
-<!-- <nav class="sidebar" *ngIf="appSelected">
-  <ul class="nav flex-column">
-    <li class="nav-item">
-      <a class="nav-link">Configuración</a>
-      <ul class="sub-menu">
-        <li><a routerLink="/empleados">Empleados</a></li>
-        <li><a routerLink="/ruteo">Ruteo</a></li>
-        <li><a routerLink="/documentos">Documentos</a></li>
-      </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link">Procesos</a>
-      <ul class="sub-menu">
-        <li><a routerLink="/solicoti">Solicitud de cotizacion</a></li>
-        <li><a routerLink="/solioc">Solicitud de O/C</a></li>
-        <li><a routerLink="/solipago">Solicitud de pago</a></li>
-        <li><a routerLink="norute">Todas las solicitudes</a></li>
-        <li><a routerLink="norute">Solicitudes abiertas</a></li>
-        <li><a routerLink="norute">Solicitudes no aprobadas</a></li>
-      </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link">Consultas</a>
-      <ul class="sub-menu">
-        <li><a routerLink="norute">Consulta 1</a></li>
-        <li><a routerLink="norute">Consulta 2</a></li>
-        <li><a routerLink="norute">Consulta 3</a></li>
-      </ul>
-    </li>
-    <div class="text-center">
-      <button class="btn btn-primary mt-5 col-md-5" (click)="backToMain()">Regresar</button>
+  <div class="sidebar" >
+    <ul class="nav flex-column">
+      <li class="nav-item dropdown" *appAuthorize="'42'">
+        <button mat-stroked-button>Configuración</button>
+        <div class="menu" >
+          <a class="item"  mat-button routerLink="/ruteo" *appAuthorize="'21'">Ruteo</a>
+          <!-- <a class="dropdown-item" routerLink="/documentos">Documentos</a> -->
+        </div>
+      </li>
+      <li class="nav-item dropdown" *appAuthorize="'43'">
+        <button mat-stroked-button>Procesos</button>
+        <div class="menu"  >
+          <a class="item" mat-button (click)="routToCot()" *appAuthorize="'25'">Solicitud de cotizacion</a>
+          <a class="item" mat-button (click)="routToOC()" *appAuthorize="'28'">Solicitud de O/C</a>
+          <a class="item" mat-button (click)="routToPago()" *appAuthorize="'31'">Solicitud de pago</a>
+          <a class="item" mat-button routerLink="/allrequest" *appAuthorize="'34'">Todas las solicitudes</a>
+          <a class="item" mat-button routerLink="/solAprob" *appAuthorize="'35'">Consultar solicitudes</a>
+          <a class="item" mat-button routerLink="/reportes" *appAuthorize="'9999'">Reportes</a>
+          <!-- <a class="dropdown-item" routerLink="/solNoAprob">Solicitudes no aprobadas</a> -->
+        </div>
+      </li>
+      <!-- <li class="nav-item dropdown" *appAuthorize="'44'">
+        <a class="nav-link dropdown-toggle btn " href="#" id="configuracionDropdown" role="button"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Consultas
+        </a>
+        <div class="dropdown-menu" aria-labelledby="configuracionDropdown">
+          <a class="dropdown-item" routerLink="norute">Consulta 1</a>
+          <a class="dropdown-item" routerLink="norute">Consulta 2</a>
+          <a class="dropdown-item" routerLink="norute">Consulta 3</a>
+        </div>
+      </li> -->
+      
+    </ul>
+    <div class="regresar">
+      <button class="back-button" mat-raised-button onclick="history.back()"><i class="bi bi-arrow-left h4"></i></button> 
     </div>
-  </ul>
-</nav> -->
+  </div>
+  
+  
+  
+  <!-- <nav class="sidebar" *ngIf="appSelected">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link">Configuración</a>
+        <ul class="sub-menu">
+          <li><a routerLink="/empleados">Empleados</a></li>
+          <li><a routerLink="/ruteo">Ruteo</a></li>
+          <li><a routerLink="/documentos">Documentos</a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link">Procesos</a>
+        <ul class="sub-menu">
+          <li><a routerLink="/solicoti">Solicitud de cotizacion</a></li>
+          <li><a routerLink="/solioc">Solicitud de O/C</a></li>
+          <li><a routerLink="/solipago">Solicitud de pago</a></li>
+          <li><a routerLink="norute">Todas las solicitudes</a></li>
+          <li><a routerLink="norute">Solicitudes abiertas</a></li>
+          <li><a routerLink="norute">Solicitudes no aprobadas</a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link">Consultas</a>
+        <ul class="sub-menu">
+          <li><a routerLink="norute">Consulta 1</a></li>
+          <li><a routerLink="norute">Consulta 2</a></li>
+          <li><a routerLink="norute">Consulta 3</a></li>
+        </ul>
+      </li>
+      <div class="text-center">
+        <button class="btn btn-primary mt-5 col-md-5" (click)="backToMain()">Regresar</button>
+      </div>
+    </ul>
+  </nav> -->
+</div>

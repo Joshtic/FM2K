@@ -1,0 +1,58 @@
+.proveedores{
+    background-color: rgb(202, 202, 202);
+    border-radius: 5pt;
+}
+
+.nav-item{
+    font-weight: bold;
+}
+
+.custom-select{
+    width: 25%;
+}
+
+.input-group-text{
+    background-color: #f3f3f3;
+}
+
+.tip{
+    font-size: 9pt;
+}
+
+.table-hover tbody tr:hover {
+    cursor: pointer;
+}
+
+.btn-prov{
+    font-size: 12pt;
+}
+
+.table-rounded {
+    border-radius: 5pt; /* Ajusta el valor según el grado de redondeo deseado */
+    overflow: hidden; /* Para evitar que el contenido se salga del borde redondeado */
+  }
+
+.sol-cot-template{
+    background-color: #dbdbdb;
+    border: 1px;
+    border-radius: 5px;
+    width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.alert-message{
+    margin: 0 auto;
+    width: 75%;
+}
+
+.btn-border{
+    /*bordes que no se muestren*/
+    border: 0px;
+}
+
+.a-verify{
+    color: rgb(69, 69, 255);
+    font-style: italic;
+    text-decoration: underline;
+}

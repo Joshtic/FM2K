@@ -1,22 +1,151 @@
-<app-menu></app-menu>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="card m-5" style="width: 18rem;">
-            <img src="../../../assets/img/shield.webp" class="card-img-top" alt=".">
-            <div class="card-body">
-                <h5 class="card-title font-weight-bold text-center">SEGURIDAD Y ACCESO</h5>
-                <p class="card-text">Some text.</p>
-                <a (click)="goAdmin()" class="btn btn-primary col-md-3 text-light">Ir</a>
-            </div>
-        </div>
-        <div class="card m-5" style="width: 18rem;">
-            <img src="../../../assets/img/request.webp" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title font-weight-bold text-center">SOLICITUDES</h5>
-                <p class="card-text">Some text.</p>
-                <a (click)="goRequests()" class="btn btn-primary col-md-3 text-light">Ir</a>
-            </div>
-        </div>
+<!-- <header>
+  <nav class="navbar navbar-expand-lg  justify-content-between">
+    <div class="header-container d-flex">
+      <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo"></a>
     </div>
 
+    <div>
+      <button mat-raised-button class="mr-5" (mouseover)="showString()" (click)="getUserManual()"><i
+          class="bi bi-filetype-pdf h5 text-danger"></i>{{manualString}}</button>
+
+      <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+          class="bi bi-person-circle"></i></button>
+    </div>
+  </nav>
+
+  <p class="text-end" style="font-style: italic; color: white; margin-bottom: 0px !important;">Bienvenido: {{userName}}
+  </p>
+</header> -->
+
+<mat-toolbar class="toolbar-custom">
+  <div class="header-container">
+    <!-- <button  class="btn btn-primary mr-3"   (click)="toggleSidebar()"><i class="bi bi-list h5"></i></button> -->
+    <a routerLink="/main"><img src="assets/img/logo.png" alt="logo" class="logo" width="200"></a>
+  </div>
+  <span class="example-spacer"></span>
+  <div>
+    <button mat-raised-button class="mr-5" (mouseover)="showString()" (click)="getUserManual()"><i
+        class="bi bi-filetype-pdf h5 text-danger"></i>{{manualString}}</button>
+
+    <button mat-raised-button color="warn" class=" ml-2 text-end" (click)="logOut()">Cerrar sesión <i
+        class="bi bi-person-circle"></i></button>
+  </div>
+
+</mat-toolbar>
+<p class="username-header">Bienvenido: {{userName}}</p>
+
+
+
+
+<div class="container contenido-main">
+  <div class="div-cards">
+
+    <div>
+
+      <mat-card class="card-option">
+        <mat-card-content>
+          <img src="assets/img/shield.png" alt="." width="250">
+          <div>
+            <h4 class="card-title font-weight-bold text-center">SEGURIDAD Y ACCESO</h4>
+            <button mat-raised-button (click)="goAdmin()" class="primary-button col-md-4 text-light">Ir</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div>
+
+      <mat-card class="card-option">
+        <mat-card-content>
+          <img src="assets/img/request.png" alt="." width="250">
+          <div>
+            <h4 class="card-title font-weight-bold text-center">SOLICITUDES</h4>
+            <button mat-raised-button (click)="goRequests()" class="primary-button col-md-4 text-light">Ir</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div>
+
+      <mat-card class="card-option">
+        <mat-card-content>
+          <img src="assets/img/nomina.jpg" alt="." width="250">
+          <div>
+            <h4 class="card-title font-weight-bold text-center">NÓMINA</h4>
+            <button mat-raised-button (click)="goNomina()" class="primary-button col-md-4 text-light">Ir</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div>
+
+      <mat-card class="card-option">
+        <mat-card-content>
+          <img src="assets/img/comint.png" alt="." width="250">
+          <div>
+            <h4 class="card-title font-weight-bold text-center">COMUNICACIÓN INTERNA</h4>
+            <button mat-raised-button (click)="goComInt()" class="primary-button col-md-4 text-light">Ir</button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- <mat-card class="card-option">
+      <mat-card-content>
+        <img src="assets/img/nomina.jpg" alt="." width="250">
+        <div>
+          <h4 class="card-title font-weight-bold text-center">BITÁCORA</h4>
+          <button mat-raised-button (click)="goComInt()" class="primary-button col-md-4 text-light">Ir</button>
+        </div>
+      </mat-card-content>
+    </mat-card> -->
+
+
+
+
+
+
+    <!-- <div class="card m-5 text-center" style="width: 18rem;" *appAuthorize="'45'">
+      <img src="assets/img/shield.png" class="card-img-top" alt=".">
+      <div class="card-body">
+        <h4 class="card-title font-weight-bold text-center">SEGURIDAD Y ACCESO</h4>
+        <button mat-raised-button (click)="goAdmin()" class="primary-button col-md-4 text-light">Ir</button>
+      </div>
+    </div>
+
+    <div class="card m-5 text-center" style="width: 18rem;" *appAuthorize="'46'">
+      <img src="assets/img/request.png" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h4 class="card-title font-weight-bold text-center">SOLICITUDES</h4>
+        <button mat-raised-button (click)="goRequests()" class="primary-button col-md-4 text-light">Ir</button>
+      </div>
+    </div>
+
+    <div class="card m-5 text-center" style="width: 18rem;" *appAuthorize="'73'">
+      <img src="assets/img/nomina.jpg" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h4 class="card-title font-weight-bold text-center">NÓMINA</h4>
+        <button mat-raised-button (click)="goNomina()" class="primary-button col-md-4 text-light">Ir</button>
+      </div>
+    </div>
+
+    <div class="card m-5 text-center" style="width: 18rem;" *appAuthorize="'73'">
+      <img src="assets/img/comint.png" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h4 class="card-title font-weight-bold text-center">COMUNICACIÓN INTERNA</h4>
+        <button mat-raised-button (click)="goComInt()" class="primary-button col-md-4 text-light">Ir</button>
+      </div>
+    </div> -->
+
+    <!-- <div class="card m-5 text-center" style="width: 18rem;" *appAuthorize="'73'">
+      <img src="assets/img/nomina.jpg" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h4 class="card-title font-weight-bold text-center">BITÁCORA</h4>
+        <button mat-raised-button (click)="goComInt()" class="primary-button col-md-4 text-light">Ir</button>
+      </div>
+    </div> -->
+
+  </div>
 </div>

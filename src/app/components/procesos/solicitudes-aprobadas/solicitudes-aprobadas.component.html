@@ -1,0 +1,206 @@
+<app-menu></app-menu>
+<div class="container">
+  <h2 class="font-weight-bolt ruteo">CONSULTAR SOLICITUDES POR ESTADO</h2>
+
+  <!--  -->
+  <div class="formRol" *appAuthorize="'35'">
+    <form class="form-tiposol d-flex row mb-5">
+      <div class="form " style="display: flex; flex-direction: row; gap: 30px;">
+       <div style="display: flex; flex-direction: column;">
+         <label class="form-label" for="tipoSol"> Tipo de Solicitud:</label>
+         <select class="form-select" name="tipoSol" [(ngModel)]="AbierTipoSol">
+           <option disabled selected value="0">Seleccione una opción...</option>
+           <option *ngFor="let tpsol of tipoSol" [value]="tpsol.tipoSolId">
+             {{ tpsol.tipoSolNombre }}
+           </option>
+         </select>
+       </div>
+        <div style="display: flex; flex-direction: column;" >
+          <label class="form-label" for="estadoSol"> Estados:</label>
+          <select class="form-select" name="estadoSol" [(ngModel)]="Allstate">
+            <option disabled selected value="0">Seleccione una opción...</option>
+            <option value="A">Activo</option>
+            <option value="C">Anulado</option>
+            <option value="F">Finalizado</option>
+          </select>
+        </div>
+        <div class="botones" >
+          <button
+            class="success-button-outline"
+            style="padding: 8px"
+            (click)="consultarSolicitudes()"
+          >
+            Consultar
+          </button>
+        </div>
+      </div>
+    </form>
+    <div class="mb-1 text-end">
+      <button class="pagination-btnl primary-button mr-2" (click)="prevPage()">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <button class=" pagination-btnr primary-button" (click)="nextPage()">
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+    <div class="mb-5">
+      <table
+        class="table table-bordered text-center "
+        id="table-data"
+      >
+        <thead>
+          <tr>
+            <th class="align-middle cab-x">Código</th>
+            <th class="align-middle cab-z">Area solicitante</th>
+            <th class="align-middle cab-x">N° Solicitud</th>
+            <th class="align-middle cab-z">Empleado solicitante</th>
+            <th class="align-middle cab-x">Fecha</th>
+            <th class="align-middle cab-x">Estado</th>
+            <th class="align-middle cab-x">Tracking</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="!isConsulta">
+            <td class="text-danger" colspan="8">
+              Aún no se han consultado solicitudes
+            </td>
+          </tr>
+          <tr *ngIf="!isSolicitud">
+            <td class="text-danger" colspan="8">
+              No se han registrado items para esta solicitud
+            </td>
+          </tr>
+          <tr *ngIf="!isSolicitud">
+            <td class="text-danger" colspan="8">
+              No se han registrado items para esta solicitud
+            </td>
+          </tr>
+          <ng-container *ngIf="btp == 1">
+            <tr *ngFor="let sol of allSol | paginate: { itemsPerPage: 10, currentPage: currentPage } ">
+              <td class="align-middle">{{ sol.cabSolCotNumerico }}</td>
+              <ng-container *ngFor="let area of areaList">
+                <td
+                  class="align-middle"
+                  *ngIf="area.areaIdNomina === sol.cabSolCotIdArea"
+                >
+                  {{ area.areaDecp }}
+                </td>
+              </ng-container>
+              <td class="align-middle">{{ sol.cabSolCotNoSolicitud }}</td>
+              <ng-container *ngFor="let emp of empleadoList">
+                <td
+                  class="align-middle"
+                  *ngIf="emp.empleadoIdNomina === sol.cabSolCotSolicitante"
+                >
+                  {{ emp.empleadoNombres }} {{ emp.empleadoApellidos }}
+                </td>
+              </ng-container>
+              <td class="align-middle">
+                {{ sol.cabSolCotFecha | date : "yyyy-MM-dd" }}
+              </td>
+              <td class="align-middle" [ngSwitch]="sol.cabSolCotEstado">
+                <span *ngSwitchCase="'A'">Activo</span>
+                <span *ngSwitchCase="'F'">Finalizado</span>
+                <span *ngSwitchCase="'C'">Cancelado</span>
+              </td>
+              <ng-container *ngFor="let trck of trckList">
+                <td
+                  class="align-middle"
+                  *ngIf="trck.nivel === sol.cabSolCotEstadoTracking"
+                >
+                  {{ trck.descRuteo }}
+                </td>
+              </ng-container>
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="btp == 2">
+            <tr *ngFor="let sol of allSol | paginate: { itemsPerPage: 10, currentPage: currentPage } ">
+              <td class="align-middle">{{ sol.cabSolOCNumerico }}</td>
+              <ng-container *ngFor="let area of areaList">
+                <td
+                  class="align-middle"
+                  *ngIf="area.areaIdNomina === sol.cabSolOCIdArea"
+                >
+                  {{ area.areaDecp }}
+                </td>
+              </ng-container>
+              <td class="align-middle">{{ sol.cabSolOCNoSolicitud }}</td>
+              <ng-container *ngFor="let emp of empleadoList">
+                <td
+                  class="align-middle"
+                  *ngIf="emp.empleadoIdNomina === sol.cabSolOCSolicitante"
+                >
+                  {{ emp.empleadoNombres }}<br />{{ emp.empleadoApellidos }}
+                </td>
+              </ng-container>
+              <td class="align-middle">
+                {{ sol.cabSolOCFecha | date : "yyyy-MM-dd" }}
+              </td>
+              <td class="align-middle" [ngSwitch]="sol.cabSolOCEstado">
+                <span *ngSwitchCase="'A'">Activo</span>
+                <span *ngSwitchCase="'F'">Finalizado</span>
+                <span *ngSwitchCase="'C'">Cancelado</span>
+              </td>
+              <ng-container *ngFor="let trck of trckList">
+                <td
+                  class="align-middle"
+                  *ngIf="trck.nivel === sol.cabSolOCEstadoTracking"
+                >
+                  {{ trck.descRuteo }}
+                </td>
+              </ng-container>
+            </tr>
+          </ng-container>
+
+          <ng-container *ngIf="btp == 3 ">
+            <tr *ngFor="let sol of allSol | paginate: { itemsPerPage: 10, currentPage: currentPage } ">
+              <td class="align-middle">{{ sol.cabPagoNumerico }}</td>
+              <ng-container *ngFor="let area of areaList">
+                <td
+                  class="align-middle"
+                  *ngIf="area.areaIdNomina === sol.cabPagoIdAreaSolicitante"
+                >
+                  {{ area.areaDecp }}
+                </td>
+              </ng-container>
+              <td class="align-middle">{{ sol.cabPagoNoSolicitud }}</td>
+              <ng-container *ngFor="let emp of empleadoList">
+                <td
+                  class="align-middle"
+                  *ngIf="emp.empleadoIdNomina === sol.cabPagoSolicitante"
+                >
+                  {{ emp.empleadoNombres }}<br />{{ emp.empleadoApellidos }}
+                </td>
+              </ng-container>
+
+              <td class="align-middle">
+                {{ sol.cabPagoFechaEmision | date : "yyyy-MM-dd" }}
+              </td>
+              <td class="align-middle" [ngSwitch]="sol.cabPagoEstado">
+                <span *ngSwitchCase="'A'">Activo</span>
+                <span *ngSwitchCase="'F'">Finalizado</span>
+                <span *ngSwitchCase="'C'">Cancelado</span>
+              </td>
+              <ng-container *ngFor="let trck of trckList">
+                <td
+                  class="align-middle"
+                  *ngIf="trck.nivel === sol.cabPagoEstadoTrack"
+                >
+                  {{ trck.descRuteo }}
+                </td>
+              </ng-container>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-end">
+      <button style="border: 1px solid rgb(133, 255, 133); border-radius: 10px; padding-left: 10px; padding-right: 10px; background-color:rgb(200, 255, 200) ;" [disabled]="!isConsulta" (click)="exportexcel()">
+        Exportar
+        <img src="assets/img/excel.png" alt="" width="40px"/>
+        
+      </button>
+    </div>
+  </div>
+</div>
